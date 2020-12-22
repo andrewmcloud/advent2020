@@ -1,36 +1,22 @@
 (ns advent-2020.day1
-  (:require [clojure.java.io :as io]))
-
-(defn- read-string-file [f]
-  (with-open [rdr (io/reader (io/resource f))]
-    (reduce conj [] (line-seq rdr))))
-
+  (:require [advent-2020.util :refer [read-string-file]]))
 
 (defn- string-list->int-list
   [l]
   (map #(Integer/parseInt %) l))
 
-(defn- build-sorted-list
-  []
-  (->> "day1-input.txt"
-       read-string-file
-       string-list->int-list
-       sort
-       reverse))
-
-(defn solve-1
+(defn- which2=2020
   [l]
-  (loop [start 0
+  (loop [[x & xs] l
          end (dec (count l))]
-    (let [c1 (nth l start)
-          c2 (nth l end)
-          s (+ c1 c2)]
+    (let [c (nth l end)
+          s (+ x c)]
       (cond
-        (< s 2020) (recur start (dec end))
-        (> s 2020) (recur (inc start) (dec (count l)))
-        :else (println "result: " c1","c2"-" (* c1 c2))))))
+        (< s 2020) (recur x (dec end))
+        (> s 2020) (recur xs (dec (count l)))
+        :else (println "result: " x","c"-" (* x c))))))
 
-(defn solve-2
+(defn which3=2020
   [l]
   (loop [head 0
          start 1
@@ -43,4 +29,20 @@
             (> s 2020) (recur (inc head) (inc start) (dec (count l)))
             :else (println "result: " c1","c2","c3"-" (* c1 c2 c3))))))
 
+(defn- solve-1
+  []
+  (->> "day1-input.txt"
+        read-string-file
+        string-list->int-list
+        sort
+        reverse
+        which2=2020))
 
+(defn- solve-2
+  []
+  (->> "day1-input.txt"
+       read-string-file
+       string-list->int-list
+       sort
+       reverse
+       which3=2020))
