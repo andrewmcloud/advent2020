@@ -1,11 +1,7 @@
 (ns advent-2020.day3
-  (:require [clojure.java.io :as io]))
+  (:require [advent-2020.util :refer [read-string-file]]))
 
 (def tree "#")
-
-(defn- read-string-file [f]
-  (with-open [rdr (io/reader (io/resource f))]
-    (reduce conj [] (line-seq rdr))))
 
 (defn- parse-input
   [l]

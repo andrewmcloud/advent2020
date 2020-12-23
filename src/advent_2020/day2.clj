@@ -1,9 +1,5 @@
 (ns advent-2020.day2
-  (:require [clojure.java.io :as io]))
-
-(defn- read-string-file [f]
-  (with-open [rdr (io/reader (io/resource f))]
-    (reduce conj [] (line-seq rdr))))
+  (:require [advent-2020.util :refer [read-string-file]]))
 
 (def pwd-regex #"(?<min>[0-9]+)-(?<max>[0-9]+) (?<letter>[a-z]): (?<password>[a-z]+)")
 

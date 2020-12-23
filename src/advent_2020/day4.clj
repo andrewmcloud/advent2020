@@ -1,10 +1,6 @@
 (ns advent-2020.day4
-  (:require [clojure.java.io :as io]
-            [clojure.string :as s]))
-
-(defn- read-string-file [f]
-  (with-open [rdr (io/reader (io/resource f))]
-    (reduce conj [] (line-seq rdr))))
+  (:require [clojure.string :as s]
+            [advent-2020.util :refer [read-string-file]]))
 
 (def credentials #{"byr" "iyr" "eyr" "hgt" "hcl" "ecl" "pid"})
 

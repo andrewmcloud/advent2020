@@ -1,6 +1,6 @@
 (ns advent-2020.day5
-  (:require [clojure.java.io :as io]
-            [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [advent-2020.util :refer [read-string-file]]))
 
 (defn- read-string-file [f]
   (with-open [rdr (io/reader (io/resource f))]
