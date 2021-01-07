@@ -7,40 +7,6 @@
        read-string-file
        (map #(Integer/parseInt %))))
 
-(defn- insert-plug&device
-  [adaptor-list]
-  (let [device (+ 3 (apply max adaptor-list))
-        plug 0]
-    (conj adaptor-list plug device)))
-
-(defn- build-adapter-graph
-  [adaptors]
-  (letfn [(valid-adaptors [adaptor]
-            (filter (set (range (inc adaptor) (+ 4 adaptor))) adaptors))]
-    (reduce (fn [graph adaptor]
-              (if adaptor
-                (assoc graph adaptor (valid-adaptors adaptor))
-                graph))
-            {}
-            adaptors)))
-
-(defn- dfs
-  [graph target]
-  (fn search
-    [path visited]
-    (let [current (peek path)]
-      (if (= target current)
-        [path]
-        (->> (get graph current)
-             (remove visited)
-             (mapcat #(search (conj path %) (conj visited %))))))))
-
-(defn- find-adaptor-combinations
-  [graph start target]
-  (let [path [start]
-        visited #{start}]
-    ((dfs graph target) path visited)))
-
 (defn- update-joltage-map
   [jm n joltage-key]
   (-> jm
@@ -59,20 +25,43 @@
 
 (defn- x-joltage [jm] (* (:1 jm) (:3 jm)))
 
+(defn- insert-plug&device
+  [adaptor-list]
+  (let [device (+ 3 (apply max adaptor-list))
+        plug 0]
+    (conj adaptor-list plug device)))
+
+(defn- build-adapter-graph
+  [adaptors]
+  (letfn [(valid-adaptors [adaptor]
+            (filter (set (range (inc adaptor) (+ 4 adaptor))) adaptors))]
+    (reduce (fn [graph adaptor]
+              (if adaptor
+                (assoc graph adaptor (valid-adaptors adaptor))
+                graph))
+            {}
+            adaptors)))
+
+(defn- dfs
+  []
+  (def traverse
+    (memoize
+      (fn [k joltage-graph]
+        (if (not-empty (get joltage-graph k))
+          (apply + (map #(traverse % joltage-graph) (get joltage-graph k)))
+          1)))))
+
 (defn solve-1
   []
-  (->> "day10-input.txt"
+  (->> "day10-test.txt"
        parse-input
        traverse-adaptors
        x-joltage))
 
 (defn solve-2
   []
-  (let [adaptor-list (->> "day10-test.txt" parse-input)
-        plug-joltage 0
-        device-joltage (+ 3 (apply max adaptor-list))]
-    (-> adaptor-list
-        (conj plug-joltage device-joltage)
-        build-adapter-graph
-        (find-adaptor-combinations plug-joltage device-joltage)
-        count)))
+  (->> "day10-input.txt"
+       parse-input
+       insert-plug&device
+       build-adapter-graph
+       ((dfs) 0)))
