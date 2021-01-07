@@ -42,14 +42,12 @@
             {}
             adaptors)))
 
-(defn- dfs
-  []
-  (def traverse
-    (memoize
-      (fn [k joltage-graph]
-        (if (not-empty (get joltage-graph k))
-          (apply + (map #(traverse % joltage-graph) (get joltage-graph k)))
-          1)))))
+(def dfs
+  (memoize
+    (fn [k joltage-graph]
+      (if (not-empty (get joltage-graph k))
+        (apply + (map #(dfs % joltage-graph) (get joltage-graph k)))
+        1))))
 
 (defn solve-1
   []
@@ -64,4 +62,4 @@
        parse-input
        insert-plug&device
        build-adapter-graph
-       ((dfs) 0)))
+       (dfs 0)))
