@@ -4,8 +4,10 @@
 (defn- clean-buslist
   [bus-list]
   (->> (clojure.string/split bus-list #",")
-       (remove #(= "x" %))
-       (map #(Integer/parseInt %))))
+       (map #(try
+               (Integer/parseInt %)
+               (catch NumberFormatException e %)))
+       vec))
 
 (defn- parse-input
   []
@@ -13,9 +15,9 @@
         bus-map (assoc {} :timestamp (Integer/parseInt (first in)) :bus-list (last in))]
     (update bus-map :bus-list clean-buslist)))
 
-(defn earliest-bus
+(defn- earliest-bus
  [timestamp bus-list]
- (loop [[bus & rest] bus-list
+ (loop [[bus & rest] (remove #(= "x" %) bus-list)
         time (Integer/MAX_VALUE)
         earliest -1]
      (cond
@@ -27,3 +29,27 @@
   []
   (let [bus-schedule (parse-input)]
     (earliest-bus (:timestamp bus-schedule) (:bus-list bus-schedule))))
+
+(defn- build-pairs
+  [{:keys [bus-list]}]
+  (->> bus-list
+       (map-indexed (fn [idx num]
+                      (when (int? num)
+                        [(mod (- num idx) num) num])))
+       (remove nil?)
+       (sort-by second)
+       reverse)) ;;sort moduli by decreasing value per wikipedia
+
+;;https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Search_by_sieving
+(defn CRTsieve [[result product] [num modulo]]
+  (loop [result result]
+    (if (= num (mod result modulo))
+      [result (* product modulo)]
+      (recur (+ result product)))))
+
+(defn solve-2
+  []
+  (->> (parse-input)
+       build-pairs
+       (reduce CRTsieve)
+       first))
